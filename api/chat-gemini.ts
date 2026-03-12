@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const genAI = new GoogleGenerativeAI(apiKey);
     
     // Đổi sang bản 3.1 Flash Lite để lấy RPD 500
-    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
     const result = await model.generateContent([
       prompt,
@@ -37,3 +37,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({ error: error.message });
   }
 }
+
