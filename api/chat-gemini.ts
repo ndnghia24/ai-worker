@@ -15,17 +15,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // SỬ DỤNG MODEL GEMINI 3.1 FLASH IMAGE PREVIEW MỚI NHẤT
-    const model = genAI.getGenerativeModel({ 
-        model: "gemini-2.5-flash-image" // "gemini-3.1-flash-image-preview" 
-    });
+    // Đổi sang bản 3.1 Flash Lite để lấy RPD 500
+    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
 
     const result = await model.generateContent([
       prompt,
       {
         inlineData: {
           data: imageBase64.split(',').pop() || "", 
-          mimeType: "image/jpeg", 
+          mimeType: "image/jpeg", // Đã chuyển sang JPEG để nhẹ hơn
         },
       },
     ]);
@@ -34,9 +32,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json({ result: response.text().trim() });
 
   } catch (error: any) {
+    // Nếu vẫn dính Rate Limit (429/503), trả về 503 để Bot Orchestrator biết đường Retry
     console.error("Worker Error:", error.message);
-    // Trả về 503 để bot chủ chủ động retry sang worker khác
     return res.status(503).json({ error: error.message });
   }
 }
-
