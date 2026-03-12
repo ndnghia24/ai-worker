@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // SỬ DỤNG MODEL GEMINI 3.1 FLASH IMAGE PREVIEW MỚI NHẤT
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-3.1-flash-image-preview" 
+        model: "gemini-2.5-flash-image" // "gemini-3.1-flash-image-preview" 
     });
 
     const result = await model.generateContent([
@@ -39,3 +39,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({ error: error.message });
   }
 }
+
