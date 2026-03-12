@@ -15,26 +15,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Đổi sang bản 3.1 Flash Lite để lấy RPD 500
-    const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
+    // Sử dụng Gemini 3.1 Flash Lite Preview
+    const model = genAI.getGenerativeModel({ 
+        model: "gemini-3.1-flash-lite-preview" 
+    });
 
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: imageBase64.split(',').pop() || "", 
-          mimeType: "image/jpeg", // Đã chuyển sang JPEG để nhẹ hơn
-        },
-      },
-    ]);
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            { text: prompt },
+            { 
+              inlineData: { 
+                data: imageBase64.split(',').pop() || "", 
+                mimeType: "image/jpeg" 
+              } 
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        thinkingConfig: {
+          includeThoughts: false,
+          thinkingLevel: "high"
+        }
+      }
+    });
 
     const response = await result.response;
-    return res.status(200).json({ result: response.text().trim() });
+    const text = response.text().trim();
+
+    return res.status(200).json({ result: text });
 
   } catch (error: any) {
-    // Nếu vẫn dính Rate Limit (429/503), trả về 503 để Bot Orchestrator biết đường Retry
-    console.error("Worker Error:", error.message);
+    console.error("Worker Thinking Error:", error.message);
     return res.status(503).json({ error: error.message });
   }
 }
-
