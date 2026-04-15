@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     // Sử dụng Gemini 3.1 Flash Lite Preview
     const model = genAI.getGenerativeModel({ 
-        model: "gemini-3.1-flash-preview" 
+        model: "gemini-3-flash-preview" 
     });
 
     const result = await model.generateContent({
